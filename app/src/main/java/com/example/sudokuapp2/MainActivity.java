@@ -5,6 +5,7 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.text.TextWatcher;
 import android.text.Editable;
+import android.view.View;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -14,28 +15,32 @@ public class MainActivity extends AppCompatActivity
     private Game game;
     private AppInterface appInterface;
 
+    private Storage storage;
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        storage = new Storage(this);
 
-        //create model
-        game = new Game();
+        newGame();
+    }
 
-        //create interface, draw initial board
-        Point screenSize = new Point();
-        getWindowManager().getDefaultDisplay().getSize(screenSize);
-        int width = screenSize.x/SIZE;
 
-        appInterface = new AppInterface(this, SIZE, width);
-        appInterface.drawInitialBoard(game.getBoard());
+    class ButtonClickHandler implements View.OnClickListener{
 
-        //attach event handlers
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                TextChangeHandler temp = new TextChangeHandler(i, j);
-                appInterface.setTextChangeHandler(temp, i, j);
+        @Override
+        public void onClick(View v) {
+            if (v.getId() == appInterface.btnNewGame.getId()){
+                newGame();
+            }
+
+            else if (v.getId() == appInterface.btnResumeGame.getId()){
+                resumeGame();
+            }
+
+            else if (v.getId() == appInterface.btnSaveGame.getId()){
+                saveGame();
             }
         }
-        setContentView(appInterface);
     }
 
     private class TextChangeHandler implements TextWatcher
@@ -99,6 +104,51 @@ public class MainActivity extends AppCompatActivity
         {
 
         }
+    }
+
+    public void newGame(){
+        //create model
+        game = new Game();
+
+        //create interface, draw initial board
+        Point screenSize = new Point();
+        getWindowManager().getDefaultDisplay().getSize(screenSize);
+        int width = screenSize.x/SIZE;
+
+
+        appInterface = new AppInterface(this, SIZE, width);
+        appInterface.drawInitialBoard(game.getBoard());
+
+        //attach event handlers
+        for (int i = 0; i < SIZE; i++) {
+            for (int j = 0; j < SIZE; j++) {
+                TextChangeHandler temp = new TextChangeHandler(i, j);
+                appInterface.setTextChangeHandler(temp, i, j);
+            }
+        }
+
+        View.OnClickListener onClickHandler = new ButtonClickHandler();
+
+        appInterface.btnSaveGame.setOnClickListener(onClickHandler);
+        appInterface.btnResumeGame.setOnClickListener(onClickHandler);
+        appInterface.btnNewGame.setOnClickListener(onClickHandler);
+
+        // update the view with a grid
+        setContentView(appInterface);
+    }
+
+    public void resumeGame(){
+
+        // update board
+        game.setBoard(storage.readSavedGame());
+        // update game interface
+        appInterface.drawSavedBoard(game.getBoard());
+    }
+
+    public void saveGame(){
+
+        // save to text file
+        storage.saveGame(game.getBoard(), appInterface.getBoard());
     }
 
 }
