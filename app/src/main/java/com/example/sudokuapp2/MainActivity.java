@@ -21,6 +21,7 @@ public class MainActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         storage = new Storage(this);
 
+        // when app start generate a new game
         newGame();
     }
 
@@ -57,7 +58,6 @@ public class MainActivity extends AppCompatActivity
         public void afterTextChanged(Editable e)
         {
             boolean complete = false;
-            //x, y is location of edit box where the event originated
 
             //get input from x, y
             String input = appInterface.getInput(x, y);
@@ -83,6 +83,7 @@ public class MainActivity extends AppCompatActivity
                         }
                     }
 
+                    // if user completes the game show them this message
                     if (complete == true){
                         appInterface.message.setText("Congratulations! You have completed the game.");
                         appInterface.message.setBackgroundColor(Color.parseColor("#009900"));
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity
         getWindowManager().getDefaultDisplay().getSize(screenSize);
         int width = screenSize.x/SIZE;
 
-
+        // initialize game board interface
         appInterface = new AppInterface(this, SIZE, width);
         appInterface.drawInitialBoard(game.getBoard());
 
@@ -127,8 +128,10 @@ public class MainActivity extends AppCompatActivity
             }
         }
 
+        // initialize event handler class
         View.OnClickListener onClickHandler = new ButtonClickHandler();
 
+        // handle the events for the three buttons
         appInterface.btnSaveGame.setOnClickListener(onClickHandler);
         appInterface.btnResumeGame.setOnClickListener(onClickHandler);
         appInterface.btnNewGame.setOnClickListener(onClickHandler);
@@ -146,8 +149,7 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void saveGame(){
-
-        // save to text file
+        // save board to persistent memory
         storage.saveGame(game.getBoard(), appInterface.getBoard());
     }
 
