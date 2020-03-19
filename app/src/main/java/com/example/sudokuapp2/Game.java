@@ -39,9 +39,15 @@ public class Game
         return true;
     }
 
+    // set a cell in a board
     public void set(int value, int x, int y)
     {
         //set value at x, y
         board[x][y] = value;
+    }
+
+    // set/update the board
+    public void setBoard(int[][] board) {
+        this.board = board;
     }
 }
